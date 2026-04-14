@@ -4,20 +4,33 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
 @Table(name = "product")
-public class Product {
+public class Product implements Persistable<Long> {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private UUID id;
+    private Long id;
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostPersist
+    @PostLoad
+    private void markNotNew() {
+        this.isNew = false;
+    }
 
     @Column(name = "name")
     private String name;
@@ -28,7 +41,8 @@ public class Product {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Product(String name, Double price) {
+    public Product(Long id, String name, Double price) {
+        this.id = id;
         this.name = name;
         this.price = price;
     }

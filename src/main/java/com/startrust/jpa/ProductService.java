@@ -1,7 +1,5 @@
 package com.startrust.jpa;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +14,20 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+//    @Transactional
+//    public void createProduct(String name, Double price) {
+//        Long lastId = productRepository.findLastId().orElse(0L);
+//        Product product = new Product();
+//        product.setId(lastId + 1);
+//        product.setName(name);
+//        product.setPrice(price);
+//        productRepository.save(product);
+//    }
+
     @Transactional
-    public void createProduct(String name, Double price) {
+    public void createProduct(Long id, String name, Double price) {
         Product product = new Product();
+        product.setId(id); // 直接使用傳入的 ID
         product.setName(name);
         product.setPrice(price);
         productRepository.save(product);
@@ -26,9 +35,11 @@ public class ProductService {
 
     @Transactional
     public void testInsertOneByOne(int count) {
+        long lastId = productRepository.findLastId().orElse(0L);
         long start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            createProduct("Item " + i, Math.random() * 100);
+            Long newId = lastId + i + 1;
+            createProduct(newId,"Item " + i, Math.random() * 100);
         }
         long end = System.currentTimeMillis();
         System.out.println("逐筆插入" + count + "筆耗時: " + (end - start) + "ms");
@@ -43,12 +54,14 @@ public class ProductService {
     @Transactional
     public void testBatchInsert(int count) {
         List<Product> producLlist = new ArrayList<>();
+        long lastId = productRepository.findLastId().orElse(0L);
         for (int i = 0; i < count; i++) {
-            producLlist.add(new Product("Item " + i, Math.random() * 100));
+            Long newId = lastId + i + 1; // 確保 ID 是唯一且遞增的
+            producLlist.add(new Product(newId, "Item " + i, Math.random() * 100));
         }
 
         long start = System.currentTimeMillis();
-        productRepository.saveAll((Iterable<? extends Product>) producLlist);
+        productRepository.saveAll(producLlist);
         long end = System.currentTimeMillis();
 
         System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
