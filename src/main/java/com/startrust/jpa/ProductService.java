@@ -1,7 +1,5 @@
 package com.startrust.jpa;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +24,9 @@ public class ProductService {
 
     @Transactional
     public void testInsertOneByOne(int count) {
-        long start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             createProduct("Item " + i, Math.random() * 100);
         }
-        long end = System.currentTimeMillis();
-        System.out.println("逐筆插入" + count + "筆耗時: " + (end - start) + "ms");
     }
 
     @Transactional
@@ -46,12 +41,7 @@ public class ProductService {
         for (int i = 0; i < count; i++) {
             producLlist.add(new Product("Item " + i, Math.random() * 100));
         }
-
-        long start = System.currentTimeMillis();
         productRepository.saveAll((Iterable<? extends Product>) producLlist);
-        long end = System.currentTimeMillis();
-
-        System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
     }
 
     public List<Product> findAllProducts() {

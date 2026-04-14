@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * DTO for {@link Product}
@@ -13,12 +12,12 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class ProductDto implements Serializable {
-    UUID id;
+    Long id;
     String name;
     Double price;
     LocalDateTime createdAt;
 
-    public ProductDto(UUID id, String name, Double price) {
+    public ProductDto(Long id, String name, Double price) {
         this.id = id;
         this.name = name;
         this.price = price;
