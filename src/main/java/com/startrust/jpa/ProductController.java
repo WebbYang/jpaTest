@@ -24,7 +24,10 @@ public class ProductController {
     @PostMapping("/batch-insert-test")
     public ResponseEntity<String> batchInsertTest(@RequestParam int count) {
         statistics.clear();
+        long start = System.currentTimeMillis();
         productService.testBatchInsert(count); // 測試批次插入 n 筆資料
+        long end = System.currentTimeMillis();
+        System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
         printStatistics();
         return ResponseEntity.ok("Batch insert test executed");
     }
@@ -32,7 +35,10 @@ public class ProductController {
     @PostMapping("/insert-individual-test")
     public ResponseEntity<String> insertIndividualTest(@RequestParam int count) {
         statistics.clear();
+        long start = System.currentTimeMillis();
         productService.testInsertOneByOne(count); // 測試逐筆插入 n 筆資料
+        long end = System.currentTimeMillis();
+        System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
         printStatistics();
         return ResponseEntity.ok("Individual insert test executed");
     }
