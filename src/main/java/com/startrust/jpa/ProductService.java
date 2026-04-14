@@ -14,7 +14,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    @Transactional
+//    @Transactional
     public void createProduct(String name, Double price) {
         Product product = new Product();
         product.setName(name);
@@ -22,7 +22,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    @Transactional
+//    @Transactional
     public void testInsertOneByOne(int count) {
         for (int i = 0; i < count; i++) {
             createProduct("Item " + i, Math.random() * 100);
@@ -35,13 +35,13 @@ public class ProductService {
     }
 
     // Batch Insert 測試
-    @Transactional
+//    @Transactional
     public void testBatchInsert(int count) {
         List<Product> producLlist = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             producLlist.add(new Product("Item " + i, Math.random() * 100));
         }
-        productRepository.saveAll((Iterable<? extends Product>) producLlist);
+        productRepository.saveAll(producLlist);
     }
 
     public List<Product> findAllProducts() {
