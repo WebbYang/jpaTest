@@ -14,7 +14,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    @Transactional
+//    @Transactional
     public void createProduct(String name, Double price) {
         Product product = new Product();
         product.setName(name);
@@ -22,7 +22,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    @Transactional
+//    @Transactional
     public void testInsertOneByOne(int count) {
         long start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
@@ -38,7 +38,7 @@ public class ProductService {
     }
 
     // Batch Insert 測試
-    @Transactional
+//    @Transactional
     public void testBatchInsert(int count) {
         List<Product> producLlist = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -46,7 +46,7 @@ public class ProductService {
         }
 
         long start = System.currentTimeMillis();
-        productRepository.saveAll((Iterable<? extends Product>) producLlist);
+        productRepository.saveAll(producLlist);
         long end = System.currentTimeMillis();
 
         System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
