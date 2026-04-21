@@ -15,43 +15,50 @@ public class ProductController {
     private final ProductService productService;
     private final Statistics statistics;
 
-    public ProductController(ProductService productService, EntityManagerFactory entityManagerFactory) {
+    public ProductController(ProductService productService, EntityManagerFactory emf) {
         this.productService = productService;
-        this.statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        this.statistics = emf.unwrap(SessionFactory.class).getStatistics();
         this.statistics.setStatisticsEnabled(true);
     }
 
     @PostMapping("/batch-insert-test")
     public ResponseEntity<String> batchInsertTest(@RequestParam int count) {
-        statistics.clear();
-        long start = System.currentTimeMillis();
-        productService.testBatchInsert(count); // 測試批次插入 n 筆資料
-        long end = System.currentTimeMillis();
-        System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
-        printStatistics();
-        return ResponseEntity.ok("Batch insert test executed");
+        return runBenchmark("batch", count, productService::testBatchInsert);
     }
 
     @PostMapping("/insert-individual-test")
     public ResponseEntity<String> insertIndividualTest(@RequestParam int count) {
-        statistics.clear();
-        long start = System.currentTimeMillis();
-        productService.testInsertOneByOne(count); // 測試逐筆插入 n 筆資料
-        long end = System.currentTimeMillis();
-        System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
-        printStatistics();
-        return ResponseEntity.ok("Individual insert test executed");
+        return runBenchmark("individual", count, productService::testInsertOneByOne);
     }
 
-    private void printStatistics() {
-        System.out.println("實體新增總數: " + statistics.getEntityInsertCount());
-        // 代表與資料庫通訊的次數 (這是 Batch 是否成功的關鍵)
-        System.out.println("JDBC 語句準備次數: " + statistics.getPrepareStatementCount());
+    private ResponseEntity<String> runBenchmark(String mode, int count, InsertOperation operation) {
+        statistics.clear();
+        long start = System.currentTimeMillis();
+        operation.run(count);
+        long elapsed = System.currentTimeMillis() - start;
 
-        if (statistics.getPrepareStatementCount() < statistics.getEntityInsertCount()) {
-            System.out.println("檢測到 Batch 執行成功！有效減少了網路往返次數。");
-        }
-        System.out.println("============================");
+        String summary = buildSummary(mode, count, elapsed);
+        System.out.println(summary);
+        return ResponseEntity.ok(summary);
+    }
+
+    private String buildSummary(String mode, int count, long elapsedMs) {
+        long entityInsertCount = statistics.getEntityInsertCount();
+        long prepareStatementCount = statistics.getPrepareStatementCount();
+        long transactionCount = statistics.getTransactionCount();
+
+        return "mode=" + mode +
+                ", requestedRows=" + count +
+                ", elapsedMs=" + elapsedMs +
+                ", entityInsertCount=" + entityInsertCount +
+                ", prepareStatementCount=" + prepareStatementCount +
+                ", transactionCount=" + transactionCount +
+                ", batchSignal=" + (prepareStatementCount < entityInsertCount ? "possible" : "not obvious");
+    }
+
+    @FunctionalInterface
+    private interface InsertOperation {
+        void run(int count);
     }
 
 
