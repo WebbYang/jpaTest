@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -14,7 +15,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-//    @Transactional
+    @Transactional
     public void createProduct(String name, Double price) {
         Product product = new Product();
         product.setName(name);
@@ -22,34 +23,26 @@ public class ProductService {
         productRepository.save(product);
     }
 
-//    @Transactional
+    @Transactional
     public void testInsertOneByOne(int count) {
-        long start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             createProduct("Item " + i, Math.random() * 100);
         }
-        long end = System.currentTimeMillis();
-        System.out.println("逐筆插入" + count + "筆耗時: " + (end - start) + "ms");
     }
 
     @Transactional
-    public void deleteProduct(List<Long> ids) {
-        productRepository.deleteAllById(ids);
+    public void testBatchInsert(int count) {
+        List<Product> productList = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            productList.add(new Product("Item " + i, Math.random() * 100));
+        }
+        productRepository.saveAll(productList);
+
     }
 
-    // Batch Insert 測試
-//    @Transactional
-    public void testBatchInsert(int count) {
-        List<Product> producLlist = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            producLlist.add(new Product("Item " + i, Math.random() * 100));
-        }
-
-        long start = System.currentTimeMillis();
-        productRepository.saveAll(producLlist);
-        long end = System.currentTimeMillis();
-
-        System.out.println("批次插入 " + count + " 筆耗時: " + (end - start) + "ms");
+    @Transactional
+    public void deleteProduct(List<UUID> ids) {
+        productRepository.deleteAllById(ids);
     }
 
     public List<Product> findAllProducts() {
@@ -61,5 +54,4 @@ public class ProductService {
                 .map(p -> new ProductDto(p.getId(), p.getName(), p.getPrice()))
                 .toList();
     }
-
 }
