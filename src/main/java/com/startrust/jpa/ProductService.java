@@ -24,7 +24,7 @@ public class ProductService {
 //        productRepository.save(product);
 //    }
 
-//    @Transactional
+    @Transactional
     public void createProduct(Long id, String name, Double price) {
         Product product = new Product();
         product.setId(id); // 直接使用傳入的 ID
@@ -33,7 +33,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
-//    @Transactional
+    @Transactional
     public void testInsertOneByOne(int count) {
         long lastId = productRepository.findLastId().orElse(0L);
         for (int i = 0; i < count; i++) {
@@ -48,7 +48,7 @@ public class ProductService {
     }
 
     // Batch Insert 測試
-//    @Transactional
+    @Transactional
     public void testBatchInsert(int count) {
         List<Product> producLlist = new ArrayList<>();
         long lastId = productRepository.findLastId().orElse(0L);
