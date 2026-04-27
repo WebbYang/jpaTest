@@ -31,6 +31,16 @@ public class ProductController {
         return runBenchmark("individual", count, productService::testInsertOneByOne);
     }
 
+    @PutMapping("/batch-update-test")
+    public ResponseEntity<String> batchUpdateTest(@RequestParam int count) {
+        return runBenchmark("batch-update", count, productService::testBatchUpdate);
+    }
+
+    @PutMapping("/update-individual-test")
+    public ResponseEntity<String> updateIndividualTest(@RequestParam int count) {
+        return runBenchmark("individual-update", count, productService::testUpdateOneByOne);
+    }
+
     private ResponseEntity<String> runBenchmark(String mode, int count, InsertOperation operation) {
         statistics.clear();
         long start = System.currentTimeMillis();

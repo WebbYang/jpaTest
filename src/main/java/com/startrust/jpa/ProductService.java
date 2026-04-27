@@ -54,4 +54,25 @@ public class ProductService {
                 .toList();
     }
 
+    @Transactional
+    public void testBatchUpdate(int i) {
+        List<Long> ids = new ArrayList<>();
+        for (int j = 0; j < i; j++) {
+            ids.add((long) j + 1);
+        }
+        List<Product> products = productRepository.findAllById(ids);
+        for (Product p : products) {
+            p.setPrice(p.getPrice() * 1.1); // 將價格增加 10%
+        }
+        productRepository.saveAll(products);
+    }
+
+    @Transactional
+    public void testUpdateOneByOne(int count) {
+        for (int i = 0; i < count; i++) {
+            Product product = productRepository.findById((long) i + 1).orElseThrow();
+            product.setPrice(product.getPrice() * 1.1); // 將價格增加 10%
+            productRepository.save(product);
+        }
+    }
 }
